@@ -6,6 +6,7 @@ import com.api.springdemo.model.response.ErrorResponse;
 import com.api.springdemo.model.response.SuccessResponse;
 import com.api.springdemo.service.ICourseService;
 import com.api.springdemo.util.CourseKey;
+import com.api.springdemo.util.validation.JwtUtil;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +23,21 @@ import java.util.Optional;
 @Validated
 public class CourseController {
     @Autowired
-    ICourseService iCourseService;
+    private ICourseService iCourseService;
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
+    private JwtUtil jwtUtil;
+    @Autowired
+    public CourseController(ICourseService iCourseService, ModelMapper modelMapper, JwtUtil jwtUtil) {
+        this.iCourseService = iCourseService;
+        this.modelMapper = modelMapper;
+        this.jwtUtil = jwtUtil;
+    }
 
     @GetMapping
     public ResponseEntity getAllCourse() {
+        String token = jwtUtil.generateToken("Enigma");
+        System.out.println("Token: " + token);
         List<Course> courseList = iCourseService.list();
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>("Success get all course!", courseList));
     }
@@ -45,6 +55,8 @@ public class CourseController {
 
     @GetMapping("/{id}")
     public ResponseEntity getById(@PathVariable String id) {
+        Boolean isValid = jwtUtil.validateToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJFbmlnbWEiLCJpYXQiOjE2NzkzNjkxMTgsImV4cCI6MTY3OTM2OTYxOH0.Vz_fMWuBpH0JE-YDDsk2X93UyJz165Jc4L31CgDPcfc");
+        System.out.println("Valid: " + isValid);
         Optional<Course> course = iCourseService.get(id);
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>("Success get data by id!", course));
     }
