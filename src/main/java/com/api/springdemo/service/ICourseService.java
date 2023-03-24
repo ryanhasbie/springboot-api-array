@@ -1,6 +1,7 @@
 package com.api.springdemo.service;
 
 import com.api.springdemo.model.Course;
+import com.api.springdemo.util.specification.SearchCriteria;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -15,4 +16,5 @@ public interface ICourseService {
     List<Course> getByTitle(String value);
     List<Course> getByDesc(String value);
     List<Course> getBy(String keyword, String value);
+    List<Course> listBy(SearchCriteria searchCriteria);
 }

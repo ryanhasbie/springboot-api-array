@@ -1,7 +1,7 @@
 package com.api.springdemo.repository;
 
 import com.api.springdemo.model.Course;
-import com.api.springdemo.util.CourseKey;
+import com.api.springdemo.util.constant.CourseKey;
 import com.api.springdemo.util.IRandomStringGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

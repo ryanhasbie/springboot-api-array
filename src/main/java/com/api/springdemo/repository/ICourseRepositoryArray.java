@@ -1,7 +1,7 @@
 package com.api.springdemo.repository;
 
 import com.api.springdemo.model.Course;
-import com.api.springdemo.util.CourseKey;
+import com.api.springdemo.util.constant.CourseKey;
 
 import java.util.List;
 import java.util.Optional;

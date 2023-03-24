@@ -5,6 +5,8 @@ import com.api.springdemo.model.request.CourseRequest;
 import com.api.springdemo.model.response.PagingResponse;
 import com.api.springdemo.model.response.SuccessResponse;
 import com.api.springdemo.service.ICourseService;
+import com.api.springdemo.util.constant.Operator;
+import com.api.springdemo.util.specification.SearchCriteria;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -83,6 +85,13 @@ public class CourseController {
             @RequestParam(defaultValue = "title") String sortBy) {
         Page<Course> courses = iCourseService.getByPagination(page, size, direction, sortBy);
         return ResponseEntity.status(HttpStatus.OK).body(new PagingResponse<>("Success get pagination", courses));
+    }
+
+    @GetMapping(params = {"key", "value", "operator"})
+    public ResponseEntity getAllBy(@RequestParam("key") String key, @RequestParam("value") String value, @RequestParam("operator") String operator) {
+        SearchCriteria searchCriteria = new SearchCriteria(key, Operator.valueOf(operator), value);
+        List<Course> courses = iCourseService.listBy(searchCriteria);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>("Success get all course by", courses));
     }
 
 }

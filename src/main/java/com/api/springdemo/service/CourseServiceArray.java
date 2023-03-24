@@ -3,7 +3,7 @@ package com.api.springdemo.service;
 import com.api.springdemo.exception.NotFoundException;
 import com.api.springdemo.model.Course;
 import com.api.springdemo.repository.ICourseRepositoryArray;
-import com.api.springdemo.util.CourseKey;
+import com.api.springdemo.util.constant.CourseKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

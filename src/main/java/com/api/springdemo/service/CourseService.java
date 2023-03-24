@@ -5,6 +5,8 @@ import com.api.springdemo.model.Course;
 import com.api.springdemo.model.CourseType;
 import com.api.springdemo.repository.ICourseRepository;
 import com.api.springdemo.repository.ICourseTypeRepository;
+import com.api.springdemo.util.specification.SearchCriteria;
+import com.api.springdemo.util.specification.Spec;
 import jakarta.persistence.EntityExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -113,5 +116,12 @@ public class CourseService implements ICourseService {
             default:
                 return iCourseRepository.findAll();
         }
+    }
+
+    @Override
+    public List<Course> listBy(SearchCriteria searchCriteria) {
+        Specification specification = new Spec<Course>().findBy(searchCriteria);
+        List<Course> courses = iCourseRepository.findAll(specification);
+        return courses;
     }
 }
