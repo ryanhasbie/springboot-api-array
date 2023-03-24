@@ -1,17 +1,18 @@
 package com.api.springdemo.service;
 
 import com.api.springdemo.model.Course;
-import com.api.springdemo.model.request.CourseRequest;
-import com.api.springdemo.util.CourseKey;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ICourseService {
     List<Course> list();
     Course create(Course course);
-    Optional<Course> get(String id);
+    Course get(String id);
     void update(Course course, String id);
     void delete(String id);
-    List<Course> findBy(CourseKey by, String value) throws Exception;
+    Page<Course> getByPagination(int page, int pageSize, String direction, String sortBy);
+    List<Course> getByTitle(String value);
+    List<Course> getByDesc(String value);
+    List<Course> getBy(String keyword, String value);
 }

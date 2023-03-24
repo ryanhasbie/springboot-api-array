@@ -2,88 +2,116 @@ package com.api.springdemo.service;
 
 import com.api.springdemo.exception.NotFoundException;
 import com.api.springdemo.model.Course;
-import com.api.springdemo.model.request.CourseRequest;
-import com.api.springdemo.model.response.ErrorResponse;
+import com.api.springdemo.model.CourseType;
 import com.api.springdemo.repository.ICourseRepository;
-import com.api.springdemo.util.CourseKey;
+import com.api.springdemo.repository.ICourseTypeRepository;
+import jakarta.persistence.EntityExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-@Service
-public class CourseService implements ICourseService{
 
+@Service
+public class CourseService implements ICourseService {
     @Autowired
     private ICourseRepository iCourseRepository;
+    @Autowired
+    private ICourseTypeRepository iCourseTypeRepository;
+
 
     @Override
     public List<Course> list() {
+        List<Course> courses = iCourseRepository.findAll();
+        if (courses.isEmpty()) {
+            throw new NotFoundException();
+        }
+        return courses;
+    }
+
+    @Override
+    public Course create(Course course){
         try {
-            List<Course> courses = iCourseRepository.getAll();
-            if (courses.isEmpty()) {
-                throw new NotFoundException();
+            Optional<CourseType> courseType = iCourseTypeRepository.findById(course.getCourseType().getCourseTypeId());
+            if (courseType.isEmpty()) {
+                throw new NotFoundException("Course type not found");
             }
-            return courses;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            course.setCourseType(courseType.get());
+            return iCourseRepository.save(course);
+        } catch (DataIntegrityViolationException e) {
+            throw new EntityExistsException();
         }
     }
 
     @Override
-    public Course create(Course course) {
-        try {
-            return iCourseRepository.create(course);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public Course get(String id){
+        Optional<Course> course = iCourseRepository.findById(id);
+        if (course.isEmpty()) {
+            throw new NotFoundException("Course not found!");
         }
-    }
-
-    @Override
-    public Optional<Course> get(String id) {
-        try {
-            Optional<Course> course = iCourseRepository.findById(id);
-            if (course.isEmpty()) {
-                throw new NotFoundException();
-            }
-            return course;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return course.get();
     }
 
     @Override
     public void update(Course course, String id) {
         try {
-            Optional<Course> find = iCourseRepository.findById(id);
-            if (find.isEmpty()) {
-                throw new NotFoundException();
-            }
-            iCourseRepository.update(course, id);
+            Course existingCourse = get(id);
+            course.setCourseId(existingCourse.getCourseId());
+            iCourseRepository.save(course);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new NotFoundException("Update failed, course id is not found!");
         }
     }
 
     @Override
     public void delete(String id) {
         try {
-            Optional<Course> find = iCourseRepository.findById(id);
-            if (find.isEmpty()) {
-                throw new NotFoundException();
-            }
-            iCourseRepository.delete(id);
+            Course existingCourse = get(id);
+            iCourseRepository.delete(existingCourse);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new NotFoundException("Delete failed, course id is not found!");
         }
     }
 
     @Override
-    public List<Course> findBy(CourseKey by, String value) throws Exception {
-        Optional<List<Course>> courses = iCourseRepository.findBy(by, value);
+    public Page<Course> getByPagination(int page, int size, String direction, String sortBy) {
+        Sort sort = Sort.by(Sort.Direction.valueOf(direction), sortBy);
+        Pageable pageable = PageRequest.of((page - 1), size, sort);
+        return iCourseRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Course> getByTitle(String value) {
+        List<Course> courses = iCourseRepository.findByTitle(value);
         if (courses.isEmpty()) {
-            throw new Exception("Course not found!");
+            throw new NotFoundException("Course with title "+value+" not found!");
         }
-        return courses.get();
+        return courses;
+    }
+
+    @Override
+    public List<Course> getByDesc(String value)  {
+        List<Course> courses = iCourseRepository.findByDescription(value);
+        if (courses.isEmpty()) {
+            throw new NotFoundException("Course with description "+value+" not found!");
+        }
+        return courses;
+    }
+
+    @Override
+    public List<Course> getBy(String keyword, String value) {
+        switch (keyword) {
+            case "title":
+                return getByTitle(value);
+            case "description":
+                return getByDesc(value);
+            default:
+                return iCourseRepository.findAll();
+        }
     }
 }

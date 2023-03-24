@@ -16,13 +16,14 @@ public class SimpleInterseptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (request.getRequestURI().contains("login") || request.getRequestURI().contains("register")) {
-            return true;
-        }
-        String token = request.getHeader("Authorization");
-        if (token == null) throw new RuntimeException("Token is not found");
-        String[] bearerToken = token.split(" ");
-        return jwtUtil.validateToken(bearerToken[1]);
+//        if (request.getRequestURI().contains("login") || request.getRequestURI().contains("register")) {
+//            return true;
+//        }
+//        String token = request.getHeader("Authorization");
+//        if (token == null) throw new RuntimeException("Token is not found");
+//        String[] bearerToken = token.split(" ");
+//        return jwtUtil.validateToken(bearerToken[1]);
+        return true;
     }
 
     @Override

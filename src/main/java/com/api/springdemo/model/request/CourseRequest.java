@@ -1,5 +1,7 @@
 package com.api.springdemo.model.request;
 
+import com.api.springdemo.model.CourseInfo;
+import com.api.springdemo.model.CourseType;
 import jakarta.validation.constraints.NotBlank;
 
 public class CourseRequest {
@@ -11,6 +13,10 @@ public class CourseRequest {
 
     @NotBlank(message = "{invalid.link.required}")
     private String link;
+
+    private CourseInfoRequest courseInfo;
+
+    private CourseTypeIdRequest courseType;
 
     public String getTitle() {
         return title;
@@ -34,5 +40,21 @@ public class CourseRequest {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public CourseInfoRequest getCourseInfo() {
+        return courseInfo;
+    }
+
+    public void setCourseInfo(CourseInfoRequest courseInfo) {
+        this.courseInfo = courseInfo;
+    }
+
+    public CourseTypeIdRequest getCourseType() {
+        return courseType;
+    }
+
+    public void setCourseType(CourseTypeIdRequest courseType) {
+        this.courseType = courseType;
     }
 }
