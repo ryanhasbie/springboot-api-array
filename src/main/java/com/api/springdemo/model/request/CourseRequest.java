@@ -1,8 +1,7 @@
 package com.api.springdemo.model.request;
 
-import com.api.springdemo.model.CourseInfo;
-import com.api.springdemo.model.CourseType;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.web.multipart.MultipartFile;
 
 public class CourseRequest {
     @NotBlank(message = "{invalid.title.required}")
@@ -10,13 +9,10 @@ public class CourseRequest {
 
     @NotBlank(message = "{invalid.description.required}")
     private String description;
-
-    @NotBlank(message = "{invalid.link.required}")
-    private String link;
-
-    private CourseInfoRequest courseInfo;
-
-    private CourseTypeIdRequest courseType;
+    private MultipartFile file;
+    private String duration;
+    private String level;
+    private String courseType;
 
     public String getTitle() {
         return title;
@@ -34,27 +30,35 @@ public class CourseRequest {
         this.description = description;
     }
 
-    public String getLink() {
-        return link;
+    public MultipartFile getFile() {
+        return file;
     }
 
-    public void setLink(String link) {
-        this.link = link;
+    public void setFile(MultipartFile file) {
+        this.file = file;
     }
 
-    public CourseInfoRequest getCourseInfo() {
-        return courseInfo;
+    public String getDuration() {
+        return duration;
     }
 
-    public void setCourseInfo(CourseInfoRequest courseInfo) {
-        this.courseInfo = courseInfo;
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
-    public CourseTypeIdRequest getCourseType() {
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    public String getCourseType() {
         return courseType;
     }
 
-    public void setCourseType(CourseTypeIdRequest courseType) {
+    public void setCourseType(String courseType) {
         this.courseType = courseType;
     }
 }

@@ -2,21 +2,28 @@ package com.api.springdemo.controller;
 
 import com.api.springdemo.model.Course;
 import com.api.springdemo.model.request.CourseRequest;
+import com.api.springdemo.model.request.File;
 import com.api.springdemo.model.response.PagingResponse;
 import com.api.springdemo.model.response.SuccessResponse;
 import com.api.springdemo.service.ICourseService;
+import com.api.springdemo.service.IFileService;
 import com.api.springdemo.util.constant.Operator;
 import com.api.springdemo.util.specification.SearchCriteria;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -29,6 +36,8 @@ public class CourseController {
     private ICourseService iCourseService;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private IFileService iFileService;
 
 //    @GetMapping
 //    public ResponseEntity getAllCourse() {
@@ -36,17 +45,16 @@ public class CourseController {
 //        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>("Success get all course!", courseList));
 //    }
 
-    @PostMapping
-    public ResponseEntity createCourse(@Valid @RequestBody CourseRequest courseRequest) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        Course newCourse = modelMapper.map(courseRequest, Course.class);
-//        Course newCourse = new Course();
-//        newCourse.setTitle(courseRequest.getTitle());
-//        newCourse.setDescription(courseRequest.getDescription());
-//        newCourse.setLink(courseRequest.getLink());
-        Course result = iCourseService.create(newCourse);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse<>("Success create course!", result));
-    }
+//    @PostMapping
+//    public ResponseEntity createCourse(@Valid @RequestBody CourseRequest courseRequest, @RequestParam("file") MultipartFile file) {
+//        Course newCourse = modelMapper.map(courseRequest, Course.class);
+////        Course newCourse = new Course();
+////        newCourse.setTitle(courseRequest.getTitle());
+////        newCourse.setDescription(courseRequest.getDescription());
+////        newCourse.setLink(courseRequest.getLink());
+//        Course result = iCourseService.create(newCourse);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse<>("Success create course!", result));
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity getById(@PathVariable String id) {
@@ -92,6 +100,19 @@ public class CourseController {
         SearchCriteria searchCriteria = new SearchCriteria(key, Operator.valueOf(operator), value);
         List<Course> courses = iCourseService.listBy(searchCriteria);
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>("Success get all course by", courses));
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity create(@Valid CourseRequest courseRequest){
+        Course result = iCourseService.create(courseRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse<>("Created Successfully", result));
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> download(@PathVariable String id) throws IOException {
+        Resource file = iCourseService.download(id);
+        byte[] fileShow = StreamUtils.copyToByteArray(file.getInputStream());
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").contentType(MediaType.IMAGE_PNG).body(fileShow);
     }
 
 }
